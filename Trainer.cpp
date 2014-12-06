@@ -1,4 +1,4 @@
-//
+//SQUAD- Greg, ryan, steven, jeremy
 //  Trainer.cpp
 //  CreatureTrainer
 //
@@ -20,125 +20,253 @@
 #include "Class4.h"
 #include "Class5.h"
 
-//#include "CreatureType.h"
 
 using namespace std;
 
-string Trainer::makeMove(stringstream& situation) {
-
-    // pull the entire string out of stringStream& situation
-    string situationString = situation.str();
-    // situationString now includes ALL of the lines that will be sent to cout
-    
-    // Here's how to use the stringSplit function
-    vector<string> lines = splitString(situationString, "\n");
-    // This splits situationString into a vector of individual lines.
-    // (it splits on the new line character "\n")
-    // To access the 3rd line (as in 0, 1, 2, 3), you would use bracket access
-    //   as in: lines[3]
-    
-    // This loop will iterate through all the lines
-    int pipeLine = -1;
-    // lines.size() tells us how many elements are in the vector<string> lines
-    // In this case, it tells us how many lines we pulled in
-    for (int i=0; i<lines.size(); i++) {
-        // Store each line in the string line
+string Trainer::makeMove(stringstream& situation)
+{
+    string situationString = situation.str();// get situation
+    cout << situationString;
+    vector<string> lines = splitString(situationString, "\n");// split lines
+    int healthline = -1;
+    for (int i=0; i<lines.size(); i++)
+    {
         string line = lines[i];
-        // Store the first char of line in the char c
         char c = line[0];
-        // If c is a pipe ('|'), then this is the line that tells us about our
-        //    party and the health of each Creature we own.
-        if (c == '|') {
-            // Store which line number this is
-            pipeLine = i;
+        if (c == '|')
+        {
+            healthline = i;
         }
     }
-    
-    // Now that we know which line has the health, do something with it
-    //cout << lines[pipeLine] << "\n"; // Output for testing only
-    
-    // Split the party health line by pipes "|"
-    vector<string> creatureHealthBits = splitString(lines[pipeLine], "|");
-    // This gives us something like the vector description below
-    /* { "",
-         " *Jackal     10/10",
-         " Yaminon    17/17",
-         " Megapode   13/13",
-         " Jackal     10/10",
-         "" } */
-    // You can see that the first and last pipe caused empty strings
-    
-    // Now, go through this information and pull out info for each entry
-    // We do 1 to <creatureHealthBits.size()-1 because we only need the middle
-    //    four elements (and are skipping the empty ones.
-    for (int i=1; i<creatureHealthBits.size()-1; i++) {
-        // cout just for testing
-        //cout << creatureHealthBits[i] << "\n";
-        
-        // We are putting the string into a stringStream so we can use >>
-        stringstream ss;
-        ss << creatureHealthBits[i];
-        
-        // For example, we have a stringstream ss containing " *Jackal   10/10 "
-        // pull the name as a string
-        string name;
-        ss >> name; // name = "*Jackal"
-        
-        // pull the health
-        int health;
-        ss >> health; // health = 10
-        
-        // Get rid of the slash char
-        char slash;
-        ss >> slash; // slash = '/'
-        
-        // get max health
-        int maxHealth;
-        ss >> maxHealth; // maxHealth = 10
-        
-        // cout this info for testing purposes
-        //cout << "Name: " << name << " health: " << health << "\n";
+    int enemyline = -1;
+    string enemystring = "";
+    for (int j = 0; j < lines.size(); ++j)
+    {
+        string line = lines[j];
+        char c1 = line[0];
+        if (c1 == 'E')
+        {
+            enemyline = j;
+            enemystring = lines[enemyline];
+        }
+    }
+    char enemname;
+    int s = 1;
+    int index2 = 1;
+    enemname = enemystring[6];
+    int damage = 0;
+    for (int x = 0; x < enemystring.size(); ++x)
+    {
+        if (enemystring[x] == '1')
+        {
+            if (enemystring[x+1] == 48)
+            {
+                damage = 10;
+            }
+            if (enemystring[x+1] == 49)
+            {
+                damage = 11;
+            }
+            if (enemystring[x+1] == 50)
+            {
+                damage = 12;
+            }
+        }
+        if (enemystring[x] >= 49 && enemystring[x] <= 59 && damage == 0)
+        {
+            damage = (int)enemystring[x];
+            damage -= 48;
+        }
+    }
+    if (damage == 12)
+    {
+        creature_to_be_captured = enemystring[6];
     }
     
-    // This is something else you can do ONLY for testing.
-    // In a previous post, I recommended #including CreatureType.h so that you
-    //    can make a Trainer::decide() function that will make the right
-    //    decision if you have perfect data about creature types.
-    // While developing, you can use the static vector<CreatureType> TYPES to
-    //    get that perfect information, though you will eventually need to write
-    //    your own function to learn that information from the data that is sent
-    //    in via stringstream& situation.
-    
-/*
-    // This makes ct a copy of the CreatureType for Creature 0 (the Axolotyl).
-    // All CreatureType and Element names start with a different letter of the
-    //    alphabet (CreatureType is A-Z, Element is A-H).
-    CreatureType ct = CreatureType::TYPES[0];
-    // You can then get the type of ct, which is 0 because it's the Axolotyl
-    int type = ct.getType();
-    // You can also directly get info from CreatureTypes::TYPES elements.
-    int elementalWeakness3 = CreatureType::TYPES[3].getElementalWeakness();
-*/
-    
-    // Output for human player
-    // Instead of doing this, you will need to replace the code of Trainer 
-    // to parse the input situation and create a proper response,
-    // (like "a" for attack or "s3" to swap to the creature in slot 3).
-    cout << situationString;
-    
-
-    /* 
-     * This line is basically what your AI chooses to do
-     * When first playing, you may type in your move.
-     * For both the core and reach portions, however, you need to
-     * comment out "cin >> response" and instead have this function
-     * generate a response string.
-     */
-    string response;
-    cin >> response;
-        
-
-    return response;
+    vector<string> creatureHealthBits = splitString(lines[healthline], "|");
+    int inplaycreatures = 4;
+    double healthpercentages[inplaycreatures];
+    int healthy[inplaycreatures];
+    int totalh[inplaycreatures];
+    int j = 0;
+    int m = 0;
+    int z = 0;
+    //string names[4];
+    char creaturetypes[4];
+    int currentpokemon = -1;
+    int temp1 = -1;
+    for (int i=1; i<creatureHealthBits.size()-1; i++)
+    {
+        //CreatureType mine;
+        char mine;
+        stringstream ss;
+        ss << creatureHealthBits[i];
+        string name;
+        ss >> name;// Names of creatures
+        if (name[0] == '*')
+        {
+            currentpokemon = i-1;
+            mine = name[1];
+        }
+        else
+        {
+            mine = name[0];
+        }
+        int health;
+        ss >> health; // Health of creatures
+        char slash;
+        ss >> slash; // slash = '/'
+        int maxHealth;
+        ss >> maxHealth; // maxHealth = 10
+        healthy[j]= health;
+        totalh[m]=maxHealth;
+        healthpercentages[z] = health/maxHealth;
+        creaturetypes[m] = mine;
+        ++m;
+        ++j;
+        ++z;
+    }
+    // Check healths
+    int total = 0;
+    double avgtotal;
+    string response = "";
+    for (int i = 0; i < inplaycreatures; ++i)
+    {
+        total += totalh[i];
+    }
+    avgtotal = total/inplaycreatures;
+    int t = 0;
+    for (int i = 0; i < inplaycreatures; ++i)
+    {
+        t += healthy[i];
+    }
+    double avghealth = 0;
+    avghealth = t/inplaycreatures;
+    string creatureline;
+    int defeatedline = -1;
+    for (int j = 0; j < lines.size(); ++j)
+    {
+        string line = lines[j];
+        char c1 = line[9];
+        if (c1 == 'd')
+        {
+            defeatedline = j;
+            creatureline = lines[defeatedline];
+        }
+    }
+    if (creatureline[28] == creature_to_be_captured)
+    {
+        int type = (int)creature_to_be_captured - 65;
+        int min = totalh[0];
+        int index3 = -1;
+        for (int y = 0; y < inplaycreatures; ++y)
+        {
+            if (totalh[y] <= min)
+            {
+                min = totalh[y]; // Find weakest player in party
+                index3 = y;
+            }
+        }
+    }
+    if (healthy[currentpokemon] <= damage)
+    {
+        for (int i = 0; i < inplaycreatures; ++i)
+        {
+            if (healthpercentages[i] == 1
+                && healthy[i] >= 15 && i != currentpokemon)
+            {
+                if (i == 0)
+                {
+                    response = "s1";
+                }
+                if (i == 1)
+                {
+                    response = "s2";
+                }
+                else if (i == 2)
+                {
+                    response = "s3";
+                }
+                else if (i == 3)
+                {
+                    response = "s4";
+                }
+                return response;
+            }
+        }
+        for (int i = 0; i < inplaycreatures; ++i)
+        {
+            if (healthy[i] >= 15 && i != currentpokemon)
+            {
+                if (i == 0)
+                {
+                    response = "s1";
+                }
+                else if (i == 1)
+                {
+                    response = "s2";
+                }
+                else if (i == 2)
+                {
+                    response = "s3";
+                }
+                else if (i == 3)
+                {
+                    response = "s4";
+                }
+                return response;
+            }
+        }
+        bool alllow = true;
+        for (int i = 0; i < inplaycreatures; ++i)
+        {
+            if (healthy[i] >= 7)
+            {
+                alllow = false;
+            }
+        }
+        if (alllow)
+        {
+            response = "r";
+            return response;
+        }
+        else
+        {
+            int max = healthy[0];
+            int index = -1;
+            for (int i = 0; i < inplaycreatures; ++i)
+            {
+                if (healthy[i] >= max)
+                {
+                    max = healthy[i];
+                    index = i;
+                }
+            }
+            if (index == 0)
+            {
+                response = "s1";
+            }
+            else if (index == 1)
+            {
+                response = "s2";
+            }
+            else if (index == 2)
+            {
+                response = "s3";
+            }
+            else if (index == 3)
+            {
+                response = "s4";
+            }
+            return response;
+            // find highest health and pick the one
+        }
+    }
+    else
+    {
+        response = "a";
+        return response;
+    }
 }
 
 
