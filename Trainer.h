@@ -1,4 +1,5 @@
 //
+//SQUAD- Greg, ryan, steven, jeremy
 //  Trainer.h
 //  CreatureTrainer
 //
@@ -44,7 +45,8 @@ public:
 private:
     // vvvvvv Your changes to Trainer.h go between this line…
     
-    
+    int counter = 0;
+    char creature_to_be_captured = '@';
     
     
     
